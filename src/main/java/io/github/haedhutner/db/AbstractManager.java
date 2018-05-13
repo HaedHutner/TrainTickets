@@ -2,8 +2,12 @@ package io.github.haedhutner.db;
 
 import io.github.haedhutner.utils.FileUtils;
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public abstract class AbstractManager<T> {
 
@@ -17,14 +21,23 @@ public abstract class AbstractManager<T> {
     protected Map<String, String> queries = new HashMap<>();
 
     protected AbstractManager(String sqlFolder) {
-        queries.put(CREATE_QUERY, FileUtils.resourceToString(sqlFolder + "/createTable.sql"));
-        queries.put(INSERT_QUERY, FileUtils.resourceToString(sqlFolder + "/insert.sql"));
-        queries.put(DELETE_QUERY, FileUtils.resourceToString(sqlFolder + "/delete.sql"));
-        queries.put(SELECT_QUERY, FileUtils.resourceToString(sqlFolder + "/select.sql"));
-        queries.put(SELECT_ALL_QUERY, FileUtils.resourceToString(sqlFolder + "/selectAll.sql"));
-        queries.put(UPDATE_QUERY, FileUtils.resourceToString(sqlFolder + "/update.sql"));
+        URL url = Thread.currentThread().getContextClassLoader().getResource(sqlFolder);
 
-        System.out.println(queries.get(CREATE_QUERY));
+        if ( url == null ) {
+            throw new RuntimeException("Could not find folder " + sqlFolder);
+        }
+
+        try {
+            File folder = new File(url.toURI());
+            if ( folder.isDirectory() ) {
+                for ( File file : Objects.requireNonNull(folder.listFiles())) {
+                    queries.put(file.getName().replace(".sql", ""), FileUtils.fileToString(file));
+                }
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
         DBConnection.exec(dbConnection -> dbConnection.noResultQuery(getQuery(CREATE_QUERY)));
     }
 

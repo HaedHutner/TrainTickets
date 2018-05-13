@@ -21,7 +21,7 @@ public class DBConnection implements AutoCloseable {
 
     public DBConnection() {
         try {
-            String connectionString = "jdbc:h2:tcp:D:/databases/trains;USER=%s;PASSWORD=%s";
+            String connectionString = String.format("jdbc:h2:tcp://localhost/D:/databases/trains;USER=%s;PASSWORD=%s", "sa", "");
             if ( defaultType == Type.MYSQL ) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connectionString = String.format("jdbc:mysql://localhost/trainsDatabase?user=%s&password=%s&useSSL=false", "root", "");
@@ -34,10 +34,7 @@ public class DBConnection implements AutoCloseable {
             // TODO
             e.printStackTrace();
         } catch (SQLException e) {
-            // TODO
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            printError(e);
         }
     }
 
@@ -63,9 +60,7 @@ public class DBConnection implements AutoCloseable {
                 statement.setObject(i + 1, parameters[i]);
             }
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            printError(e);
             return Optional.empty();
         }
 
@@ -77,9 +72,7 @@ public class DBConnection implements AutoCloseable {
             Optional<PreparedStatement> statement = constructStatement(sqlStatement, parameters);
             if (statement.isPresent()) statement.get().execute();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            printError(e);
         }
     }
 
@@ -88,9 +81,7 @@ public class DBConnection implements AutoCloseable {
             Optional<PreparedStatement> statement = constructStatement(sqlStatement, parameters);
             if (statement.isPresent()) result = statement.get().executeQuery();
         } catch (SQLException e) {
-            System.out.println("SQLException: " + e.getMessage());
-            System.out.println("SQLState: " + e.getSQLState());
-            System.out.println("VendorError: " + e.getErrorCode());
+            printError(e);
         }
 
         return Optional.ofNullable(result);
@@ -104,11 +95,17 @@ public class DBConnection implements AutoCloseable {
     @Override
     public void close() {
         try {
-            if (statement != null) statement.close();
             if (result != null) result.close();
+            if (statement != null) statement.close();
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void printError ( SQLException e ) {
+        System.out.println("SQLException: " + e.getMessage());
+        System.out.println("SQLState: " + e.getSQLState());
+        System.out.println("VendorError: " + e.getErrorCode());
     }
 }

@@ -27,6 +27,7 @@ public class CreateTrainLine extends JDialog {
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
+        setResizable(false);
         setMinimumSize(new Dimension(400, 200));
         setPreferredSize(contentPane.getMinimumSize());
 
