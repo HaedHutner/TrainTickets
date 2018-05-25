@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public class DBConnection implements AutoCloseable {
+public final class DBConnection implements AutoCloseable {
 
     public enum Type {
         MYSQL,
@@ -20,12 +20,16 @@ public class DBConnection implements AutoCloseable {
     private ResultSet result;
 
     public DBConnection() {
+        this(getDefaultType());
+    }
+
+    public DBConnection(Type type) {
         try {
             String connectionString = String.format("jdbc:h2:tcp://localhost/D:/databases/trains;USER=%s;PASSWORD=%s", "sa", "");
-            if ( defaultType == Type.MYSQL ) {
+            if (type == Type.MYSQL) {
                 Class.forName("com.mysql.cj.jdbc.Driver");
                 connectionString = String.format("jdbc:mysql://localhost/trainsDatabase?user=%s&password=%s&useSSL=false", "root", "");
-            } else if ( defaultType == Type.H2 ) {
+            } else if (type == Type.H2) {
                 Class.forName("org.h2.Driver");
                 connectionString = String.format("jdbc:h2:tcp://localhost/D:/databases/trains;USER=%s;PASSWORD=%s", "sa", "");
             }
@@ -47,7 +51,7 @@ public class DBConnection implements AutoCloseable {
     }
 
     public static void exec(Consumer<DBConnection> consumer) {
-        try (DBConnection connection = new DBConnection()) {
+        try (DBConnection connection = new DBConnection(defaultType)) {
             consumer.accept(connection);
         }
     }
@@ -103,7 +107,7 @@ public class DBConnection implements AutoCloseable {
         }
     }
 
-    public static void printError ( SQLException e ) {
+    public static void printError(SQLException e) {
         System.out.println("SQLException: " + e.getMessage());
         System.out.println("SQLState: " + e.getSQLState());
         System.out.println("VendorError: " + e.getErrorCode());

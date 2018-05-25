@@ -1,0 +1,1 @@
+UPDATE `trains` SET train_departingat = ? WHERE train_id = ?;

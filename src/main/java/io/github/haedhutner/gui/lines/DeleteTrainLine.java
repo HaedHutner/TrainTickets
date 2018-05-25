@@ -3,24 +3,33 @@ package io.github.haedhutner.gui.lines;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
+import io.github.haedhutner.gui.ApplicationGUI;
+import io.github.haedhutner.managers.LineManager;
+import io.github.haedhutner.entity.Line;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class DeleteTrainLine extends JDialog {
+
+    private Line lineToDelete;
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
     private JLabel warning;
 
-    public DeleteTrainLine() {
+    private DeleteTrainLine(Line lineToDelete) {
         setContentPane(contentPane);
         setModal(true);
         setMinimumSize(new Dimension(300, 150));
         setPreferredSize(new Dimension(300, 150));
         setResizable(false);
         getRootPane().setDefaultButton(buttonOK);
+        this.lineToDelete = lineToDelete;
 
         buttonOK.addActionListener(e -> onOK());
 
@@ -38,15 +47,16 @@ public class DeleteTrainLine extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    public static DeleteTrainLine open() {
-        DeleteTrainLine dialog = new DeleteTrainLine();
+    public static DeleteTrainLine open(Line lineToDelete) {
+        DeleteTrainLine dialog = new DeleteTrainLine(lineToDelete);
         dialog.setVisible(true);
         return dialog;
     }
 
     private void onOK() {
-        // add your code here
+        LineManager.getInstance().delete(lineToDelete);
         dispose();
+        ApplicationGUI.getInstance().updateLinesTable();
     }
 
     private void onCancel() {

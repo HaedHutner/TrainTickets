@@ -1,1 +1,1 @@
-DELETE * FROM `trainlines` WHERE train_id = ?;
+DELETE FROM `trainlines` WHERE line_id = ?;

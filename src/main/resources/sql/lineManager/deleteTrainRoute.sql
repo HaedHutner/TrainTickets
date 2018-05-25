@@ -1,0 +1,1 @@
+DELETE FROM trains_lines WHERE trains_lines.train = ?;

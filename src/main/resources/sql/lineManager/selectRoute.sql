@@ -1,2 +1,7 @@
-SELECT trainlines.line_id, trains.train_id, trainlines.line_from, trainlines.line_distance, trainlines.line_to
-FROM -- TODO
+SELECT trainlines.*
+FROM trainlines
+JOIN trains_lines
+    ON trainlines.line_id = trains_lines.line
+JOIN trains
+    ON trains_lines.train = trains.train_id
+    AND trains.train_id = ?;

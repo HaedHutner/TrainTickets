@@ -2,9 +2,9 @@ package io.github.haedhutner.managers;
 
 import io.github.haedhutner.db.AbstractManager;
 import io.github.haedhutner.db.DBConnection;
-import io.github.haedhutner.models.Line;
-import io.github.haedhutner.models.Train;
-import io.github.haedhutner.utils.SwingUtils;
+import io.github.haedhutner.entity.Line;
+import io.github.haedhutner.entity.Train;
+import io.github.haedhutner.gui.lines.TrainlinesTableModel;
 
 import javax.swing.*;
 import java.sql.ResultSet;
@@ -13,67 +13,89 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class LineManager extends AbstractManager<Line> {
+public class LineManager extends AbstractManager<Line, Integer> {
 
     private static final LineManager instance = new LineManager();
 
+    private static final String SELECT_ROUTE_QUERY = "selectRoute";
+    private static final String INSERT_ROUTE_QUERY = "insertTrainRoute";
+    private static final String DELETE_ROUTE_QUERY = "deleteTrainRoute";
+    private static final String DELETE_LINE_FROM_TRAIN = "deleteLineFromRoute";
+
     protected LineManager() {
         super("sql/lineManager");
+        query("createTrainsLinesJunction");
     }
 
-    public void insert(Line line) {
-        DBConnection.exec(connection -> connection.noResultQuery(getQuery(INSERT_QUERY), line.getStart(), line.getDistance(), line.getStop()));
+    @Override
+    public void mapTo(JTable table) {
+        DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainlinesTableModel(resultSet))));
     }
 
-    private Optional<Line> lineFromResultSet(ResultSet result) throws SQLException {
-        String from = result.getString("line_from");
+    @Override
+    public Optional<Line> modelFromResultSet(ResultSet result) throws SQLException {
+        int id = result.getInt("line_id");
+        String from = result.getString("line_start");
         double distance = result.getDouble("line_distance");
-        String to = result.getString("line_to");
+        String to = result.getString("line_stop");
 
-        return Optional.of(new Line(from, distance, to));
+        return Optional.of(new Line(id, from, distance, to));
     }
 
-    public Optional<Line> select(int id) {
-        try (DBConnection connection = new DBConnection()) {
-            Optional<ResultSet> resultSet = connection.resultQuery(getQuery(SELECT_QUERY), id);
-            if (resultSet.isPresent()) {
-                ResultSet result = resultSet.get();
-                result.next();
-                return lineFromResultSet(result);
+        @Override
+    public Optional<Line> select(Integer id) {
+        return buildQuery(SELECT_QUERY, id).queryFunction(resultSet -> {
+            try {
+                resultSet.next();
+                Optional<Line> line = modelFromResultSet(resultSet);
+                if ( line.isPresent() ) return line.get();
+            } catch (SQLException e) {
+                DBConnection.printError(e);
             }
-        } catch (SQLException e) {
-            DBConnection.printError(e);
-        }
 
-        return Optional.empty();
+            return null;
+        });
+    }
+
+    @Override
+    public void insert(Line object) {
+        query(INSERT_QUERY, object.getStart(), object.getDistance(), object.getStop());
+    }
+
+    @Override
+    public void update(Line object) {
+        query(UPDATE_QUERY, object.getStart(), object.getDistance(), object.getStop(), object.getId());
+    }
+
+    @Override
+    public void delete(Line line) {
+        DBConnection.exec(connection -> connection.noResultQuery(getRawQuery(DELETE_QUERY), line.getId()));
     }
 
     public List<Line> getTrainRoute(Train train) {
         List<Line> route = new ArrayList<>();
 
-        try ( DBConnection connection = new DBConnection() ) {
-            Optional<ResultSet> resultSet = connection.resultQuery(getQuery("selectRoute"), train.getId());
-            if (resultSet.isPresent()) {
-                ResultSet result = resultSet.get();
-                while ( result.next() ) lineFromResultSet(result).ifPresent(route::add);
+        buildQuery(SELECT_ROUTE_QUERY, train.getId()).query(resultSet -> {
+            try {
+                while (resultSet.next()) modelFromResultSet(resultSet).ifPresent(route::add);
+            } catch (SQLException e) {
+                DBConnection.printError(e);
             }
-        } catch (SQLException e) {
-            DBConnection.printError(e);
-        }
+        });
 
         return route;
     }
 
-    public void update(Line line) {
-        DBConnection.exec(connection -> connection.noResultQuery(getQuery(UPDATE_QUERY), line.getStart(), line.getDistance(), line.getStop(), line.getId()));
+    public void insertTrainRoute(Train train) {
+        train.getRoute().forEach(line -> query(INSERT_ROUTE_QUERY, train.getId(), line.getId()));
     }
 
-    public void delete(Line line) {
-        DBConnection.exec(connection -> connection.noResultQuery(getQuery(DELETE_QUERY), line.getId()));
+    public void deleteTrainRoute(Train train) {
+        query(DELETE_ROUTE_QUERY, train.getId());
     }
 
-    public void mapTo ( JTable table ) {
-        DBConnection.exec(connection -> connection.resultQuery(getQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> SwingUtils.mapResultSetToTable(resultSet, table)));
+    public void deleteLineFromTrainRoute(Train train, Line line) {
+        query(DELETE_LINE_FROM_TRAIN, train.getId(), line.getId());
     }
 
     public static LineManager getInstance() {
