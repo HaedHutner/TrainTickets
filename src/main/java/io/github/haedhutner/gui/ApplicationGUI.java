@@ -9,6 +9,8 @@ import io.github.haedhutner.entity.Train;
 import io.github.haedhutner.gui.lines.CreateOrUpdateTrainLine;
 import io.github.haedhutner.gui.lines.DeleteTrainLine;
 import io.github.haedhutner.gui.lines.TrainlinesTableModel;
+import io.github.haedhutner.gui.trains.CreateOrUpdateTrain;
+import io.github.haedhutner.gui.trains.TrainsTableModel;
 import io.github.haedhutner.managers.LineManager;
 import io.github.haedhutner.managers.TrainManager;
 
@@ -39,7 +41,7 @@ public class ApplicationGUI extends JFrame {
     private JButton newTrainLineButton1;
     private JButton deleteTrainLineButton;
     private JButton updateTrainLineButton;
-    private JButton newTrainButton1;
+    private JButton newTrainButtonFromTrainLine;
 
     private JPanel mainContentPanel;
 
@@ -51,7 +53,8 @@ public class ApplicationGUI extends JFrame {
         super.setVisible(true);
         super.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
-        TrainManager.getInstance();
+        TrainManager.getInstance().init();
+        LineManager.getInstance().init();
 
         newTrainLineButton1.addActionListener(event -> CreateOrUpdateTrainLine.create());
         deleteTrainLineButton.addActionListener(event -> {
@@ -66,12 +69,29 @@ public class ApplicationGUI extends JFrame {
             CreateOrUpdateTrainLine.update(line);
         });
 
-        updateLinesTable();
-        updateTrainsTable();
+        newTrainButton.addActionListener(event -> CreateOrUpdateTrain.create());
+        //deleteTrainButton.addActionListener(event -> {
+        //    if (trainLinesTable.getSelectedRow() == -1 || trainLinesTable.getSelectedColumn() == -1) return;
+        //    TrainlinesTableModel model = (TrainlinesTableModel) trainLinesTable.getModel();
+        //    DeleteTrain.open(model.getAt(trainLinesTable.getSelectedRow()));
+        //});
+        updateTrainButton.addActionListener(event -> {
+            if (trainLinesTable.getSelectedRow() == -1 || trainLinesTable.getSelectedColumn() == -1) return;
+            TrainsTableModel model = (TrainsTableModel) trainLinesTable.getModel();
+            Train train = model.getAt(trainLinesTable.getSelectedRow());
+            CreateOrUpdateTrain.update(train);
+        });
+
+        updateTables();
     }
 
     public static ApplicationGUI getInstance() {
         return instance;
+    }
+
+    public void updateTables() {
+        updateTrainsTable();
+        updateLinesTable();
     }
 
     public JTable getTrainsTable() {
@@ -164,9 +184,9 @@ public class ApplicationGUI extends JFrame {
         updateTrainLineButton = new JButton();
         updateTrainLineButton.setText("Update Train Line");
         panel4.add(updateTrainLineButton, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
-        newTrainButton1 = new JButton();
-        newTrainButton1.setText("New Train");
-        panel4.add(newTrainButton1, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        newTrainButtonFromTrainLine = new JButton();
+        newTrainButtonFromTrainLine.setText("New Train");
+        panel4.add(newTrainButtonFromTrainLine, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final JScrollPane scrollPane2 = new JScrollPane();
         panel3.add(scrollPane2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         trainLinesTable = new JTable();

@@ -5,6 +5,5 @@ CREATE TABLE IF NOT EXISTS `tickets`
      `ticket_train` INTEGER NOT NULL,
      PRIMARY KEY (`ticket_id`),
      KEY `fkidx_164` (`ticket_train`),
-     CONSTRAINT `tickets_to_trains` FOREIGN KEY `fkidx_164` (`ticket_train`)
-     REFERENCES `trains` (`train_id`)
+     CONSTRAINT `tickets_to_trains` FOREIGN KEY `fkidx_164` (`ticket_train`) REFERENCES `trains` (`train_id`)
   );

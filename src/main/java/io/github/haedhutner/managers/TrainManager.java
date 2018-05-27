@@ -5,6 +5,7 @@ import io.github.haedhutner.entity.Train;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -21,24 +22,24 @@ public class TrainManager extends AbstractManager<Train,Integer> {
     }
 
     @Override
-    protected Optional<Train> modelFromResultSet(ResultSet result) throws SQLException {
+    public Optional<Train> modelFromResultSet(ResultSet result) throws SQLException {
         Integer id = result.getInt("train_id");
-        LocalDateTime departure = LocalDateTime.from(result.getDate("train_departingAt").toLocalDate());
+        LocalDateTime departure = result.getTimestamp("train_departingAt").toLocalDateTime();
 
         Train train = new Train(id, departure);
-        train.setRoute( LineManager.getInstance().getTrainRoute(train) );
+        LineManager.getInstance().getTrainRoute(train).ifPresent(train::setRoute);
 
         return Optional.of(train);
     }
 
     @Override
     public void insert(Train object) {
-        query(INSERT_QUERY, object.getDepartureTime());
+        query(INSERT_QUERY, Timestamp.valueOf(object.getDepartureTime()), object.getRoute());
     }
 
     @Override
     public void update(Train object) {
-        query(UPDATE_QUERY, object.getId());
+        query(UPDATE_QUERY, object.getDepartureTime(), object.getRoute().getId(), object.getId());
     }
 
     @Override

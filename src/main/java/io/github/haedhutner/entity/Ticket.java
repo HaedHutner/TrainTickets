@@ -1,8 +1,6 @@
 package io.github.haedhutner.entity;
 
-import java.io.Serializable;
-
-public class Ticket implements Entity<Integer>, Serializable {
+public class Ticket implements Entity<Integer> {
 
     private static final double PRICE_MODIFIER = 0.005d;
 
@@ -23,9 +21,7 @@ public class Ticket implements Entity<Integer>, Serializable {
 
     private double calcPrice() {
         double price = 0.0d;
-        for (Line line : train.getRoute()) {
-            price += line.getDistance();
-        }
+        price += train.getRoute().getDistance();
         return price * PRICE_MODIFIER;
     }
 

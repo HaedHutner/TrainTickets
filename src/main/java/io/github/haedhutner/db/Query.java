@@ -29,7 +29,7 @@ public class Query {
         }
     }
 
-    public <R> Optional<R> queryFunction(Function<ResultSet, R> action) {
+    public <R> Optional<R> queryResult(Function<ResultSet, R> action) {
         try (DBConnection connection = new DBConnection()) {
             return connection.resultQuery(query, params).map(action);
         }

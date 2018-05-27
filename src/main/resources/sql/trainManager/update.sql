@@ -1,1 +1,1 @@
-UPDATE `trains` SET train_departingat = ? WHERE train_id = ?;
+UPDATE `trains` SET train_departingat = ?, train_route = ? WHERE train_id = ?;

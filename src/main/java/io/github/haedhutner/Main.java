@@ -7,7 +7,6 @@ public class Main {
 
     public static void main(String[] args) {
         DBConnection.setDefaultType(DBConnection.Type.H2);
-
         ApplicationGUI.getInstance();
     }
 

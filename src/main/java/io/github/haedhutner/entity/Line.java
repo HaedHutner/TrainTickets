@@ -1,8 +1,6 @@
 package io.github.haedhutner.entity;
 
-import java.io.Serializable;
-
-public class Line implements Entity<Integer>, Serializable {
+public class Line implements Entity<Integer> {
 
     private Integer id;
 
@@ -59,5 +57,10 @@ public class Line implements Entity<Integer>, Serializable {
 
     public void setStationStop(String stationStop) {
         this.stationStop = stationStop;
+    }
+
+    @Override
+    public String toString() {
+        return stationStart + " --" + distance + "--> " + stationStop;
     }
 }

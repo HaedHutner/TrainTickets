@@ -63,6 +63,22 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
         Query.of(getRawQuery(SELECT_ALL_QUERY)).query(resultSet -> SwingUtils.mapResultSetToTable(resultSet, table));
     }
 
+    public List<T> getAll() {
+        List<T> list = new ArrayList<>();
+
+        Query.of(getRawQuery(SELECT_ALL_QUERY)).query(resultSet -> {
+            try {
+                while (resultSet.next()) {
+                    modelFromResultSet(resultSet).ifPresent(list::add);
+                }
+            } catch (SQLException e) {
+                DBConnection.printError(e);
+            }
+        });
+
+        return list;
+    }
+
     protected abstract Optional<T> modelFromResultSet(ResultSet result) throws SQLException;
 
     protected void query(String queryName, Object... parameters) {

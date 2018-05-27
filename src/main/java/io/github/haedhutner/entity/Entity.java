@@ -1,6 +1,8 @@
 package io.github.haedhutner.entity;
 
-public interface Entity<ID> {
+import java.io.Serializable;
+
+public interface Entity<ID> extends Serializable {
 
     ID getId();
 

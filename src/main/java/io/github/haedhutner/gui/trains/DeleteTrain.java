@@ -1,39 +1,34 @@
-package io.github.haedhutner.gui.lines;
+package io.github.haedhutner.gui.trains;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
-import io.github.haedhutner.gui.ApplicationGUI;
-import io.github.haedhutner.managers.LineManager;
-import io.github.haedhutner.entity.Line;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 
-public class DeleteTrainLine extends JDialog {
-
-    private Line lineToDelete;
-
+public class DeleteTrain extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
-    private JLabel warning;
 
-    private DeleteTrainLine(Line lineToDelete) {
+    public DeleteTrain() {
         setContentPane(contentPane);
         setModal(true);
-        setMinimumSize(new Dimension(300, 150));
-        setPreferredSize(new Dimension(300, 150));
-        setResizable(false);
         getRootPane().setDefaultButton(buttonOK);
-        this.lineToDelete = lineToDelete;
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonOK.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onOK();
+            }
+        });
 
-        buttonCancel.addActionListener(e -> onCancel());
+        buttonCancel.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        });
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -44,24 +39,28 @@ public class DeleteTrainLine extends JDialog {
         });
 
         // call onCancel() on ESCAPE
-        contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-    }
-
-    public static DeleteTrainLine open(Line lineToDelete) {
-        DeleteTrainLine dialog = new DeleteTrainLine(lineToDelete);
-        dialog.setVisible(true);
-        return dialog;
+        contentPane.registerKeyboardAction(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                onCancel();
+            }
+        }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     private void onOK() {
-        LineManager.getInstance().delete(lineToDelete);
+        // add your code here
         dispose();
-        ApplicationGUI.getInstance().updateLinesTable();
     }
 
     private void onCancel() {
         // add your code here if necessary
         dispose();
+    }
+
+    public static void main(String[] args) {
+        DeleteTrain dialog = new DeleteTrain();
+        dialog.pack();
+        dialog.setVisible(true);
+        System.exit(0);
     }
 
     {
@@ -98,9 +97,6 @@ public class DeleteTrainLine extends JDialog {
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        warning = new JLabel();
-        warning.setText("Are you sure you wish to delete this train line?");
-        panel3.add(warning, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

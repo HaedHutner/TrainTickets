@@ -1,23 +1,24 @@
 package io.github.haedhutner.entity;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Train implements Entity<Integer>, Serializable {
+public class Train implements Entity<Integer> {
 
     private Integer id;
 
-    private List<Line> route = new ArrayList<>();
+    private Line route;
 
     private LocalDateTime departs;
 
-    public Train() {
-        this.route = new ArrayList<>();
+    public Train() {}
+
+    public Train ( int id, Line route ) {
+        this.id = id;
+        this.route = route;
+        this.departs = LocalDateTime.now();
     }
 
-    public Train ( int id, List<Line> route, LocalDateTime departs ) {
+    public Train ( int id, Line route, LocalDateTime departs ) {
         this.id = id;
         this.route = route;
         this.departs = departs;
@@ -28,7 +29,7 @@ public class Train implements Entity<Integer>, Serializable {
         this.departs = departure;
     }
 
-    public List<Line> getRoute() {
+    public Line getRoute() {
         return route;
     }
 
@@ -46,7 +47,7 @@ public class Train implements Entity<Integer>, Serializable {
         this.id = id;
     }
 
-    public void setRoute(List<Line> route) {
+    public void setRoute(Line route) {
         this.route = route;
     }
 

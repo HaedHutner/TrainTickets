@@ -9,8 +9,6 @@ import io.github.haedhutner.gui.lines.TrainlinesTableModel;
 import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public class LineManager extends AbstractManager<Line, Integer> {
@@ -18,13 +16,9 @@ public class LineManager extends AbstractManager<Line, Integer> {
     private static final LineManager instance = new LineManager();
 
     private static final String SELECT_ROUTE_QUERY = "selectRoute";
-    private static final String INSERT_ROUTE_QUERY = "insertTrainRoute";
-    private static final String DELETE_ROUTE_QUERY = "deleteTrainRoute";
-    private static final String DELETE_LINE_FROM_TRAIN = "deleteLineFromRoute";
 
     protected LineManager() {
         super("sql/lineManager");
-        query("createTrainsLinesJunction");
     }
 
     @Override
@@ -44,7 +38,7 @@ public class LineManager extends AbstractManager<Line, Integer> {
 
         @Override
     public Optional<Line> select(Integer id) {
-        return buildQuery(SELECT_QUERY, id).queryFunction(resultSet -> {
+        return buildQuery(SELECT_QUERY, id).queryResult(resultSet -> {
             try {
                 resultSet.next();
                 Optional<Line> line = modelFromResultSet(resultSet);
@@ -69,33 +63,22 @@ public class LineManager extends AbstractManager<Line, Integer> {
 
     @Override
     public void delete(Line line) {
-        DBConnection.exec(connection -> connection.noResultQuery(getRawQuery(DELETE_QUERY), line.getId()));
+        query(DELETE_QUERY, line.getId());
     }
 
-    public List<Line> getTrainRoute(Train train) {
-        List<Line> route = new ArrayList<>();
+    public Optional<Line> getTrainRoute(Train train) {
+        return buildQuery(SELECT_ROUTE_QUERY, train.getId()).queryResult((resultSet) -> {
 
-        buildQuery(SELECT_ROUTE_QUERY, train.getId()).query(resultSet -> {
             try {
-                while (resultSet.next()) modelFromResultSet(resultSet).ifPresent(route::add);
+                resultSet.next();
+                Optional<Line> line = modelFromResultSet(resultSet);
+                if (line.isPresent()) return line.get();
             } catch (SQLException e) {
                 DBConnection.printError(e);
             }
+
+            return null;
         });
-
-        return route;
-    }
-
-    public void insertTrainRoute(Train train) {
-        train.getRoute().forEach(line -> query(INSERT_ROUTE_QUERY, train.getId(), line.getId()));
-    }
-
-    public void deleteTrainRoute(Train train) {
-        query(DELETE_ROUTE_QUERY, train.getId());
-    }
-
-    public void deleteLineFromTrainRoute(Train train, Line line) {
-        query(DELETE_LINE_FROM_TRAIN, train.getId(), line.getId());
     }
 
     public static LineManager getInstance() {
