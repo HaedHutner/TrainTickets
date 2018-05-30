@@ -6,7 +6,7 @@ import com.intellij.uiDesigner.core.Spacer;
 import io.github.haedhutner.db.DBManager;
 import io.github.haedhutner.entity.Line;
 import io.github.haedhutner.entity.Train;
-import io.github.haedhutner.gui.CreateOrUpdateDialog;
+import io.github.haedhutner.gui.CreateFilterUpdateDialog;
 import io.github.haedhutner.managers.LineManager;
 import io.github.haedhutner.managers.TrainManager;
 
@@ -17,7 +17,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Vector;
 
-public class CreateOrUpdateTrain extends JDialog implements CreateOrUpdateDialog<Train, Integer> {
+public class CreateOrUpdateTrain extends JDialog implements CreateFilterUpdateDialog<Train, Integer> {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -54,7 +54,9 @@ public class CreateOrUpdateTrain extends JDialog implements CreateOrUpdateDialog
         dialog.idSpinner.setEnabled(false);
         dialog.buttonOK.setText("Create");
         dialog.setTitle("Create New Train");
+
         dialog.buttonOK.addActionListener(e -> dialog.createOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
 
         dialog.routeCombo.setModel(new DefaultComboBoxModel<>(new Vector<>(LineManager.getInstance().getAll())));
 
@@ -68,7 +70,26 @@ public class CreateOrUpdateTrain extends JDialog implements CreateOrUpdateDialog
         dialog.buttonOK.setText("Update");
         dialog.setTitle("Update Train");
         dialog.setEntity(train);
+
         dialog.buttonOK.addActionListener(e -> dialog.updateOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
+
+        dialog.routeCombo.setModel(new DefaultComboBoxModel<>(new Vector<>(LineManager.getInstance().getAll())));
+
+        dialog.setVisible(true);
+        return dialog;
+    }
+
+    public static CreateOrUpdateTrain filter() {
+        CreateOrUpdateTrain dialog = new CreateOrUpdateTrain();
+        dialog.idSpinner.setEnabled(false);
+        dialog.buttonOK.setText("Filter");
+        dialog.setTitle("Filter Trains");
+        dialog.buttonOK.addActionListener(e -> dialog.filterOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.filterCancel());
+
+        dialog.routeCombo.setModel(new DefaultComboBoxModel<>(new Vector<>(LineManager.getInstance().getAll())));
+
         dialog.setVisible(true);
         return dialog;
     }
@@ -85,13 +106,16 @@ public class CreateOrUpdateTrain extends JDialog implements CreateOrUpdateDialog
     @Override
     public Train getEntity() {
         Integer id;
+
         try {
             id = (Integer) idSpinner.getValue();
         } catch (Exception e) {
             return null;
         }
+
         Line selectedLine = (Line) routeCombo.getSelectedItem();
-        return new Train(id, selectedLine); // TODO
+        // TODO: Get date from field
+        return new Train(id, selectedLine);
     }
 
     @Override

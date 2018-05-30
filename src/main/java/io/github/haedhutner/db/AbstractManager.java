@@ -24,9 +24,11 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
     protected static final String SELECT_QUERY = "select";
     protected static final String DELETE_QUERY = "delete";
     protected static final String UPSERT_QUERY = "upsert";
+    protected static final String FILTER_QUERY = "filter";
     protected static final String SELECT_ALL_QUERY = "selectAll";
 
     protected Map<String, String> queries = new HashMap<>();
+    private T filter;
 
     protected AbstractManager(String sqlFolder) {
         URL url = Thread.currentThread().getContextClassLoader().getResource(sqlFolder);
@@ -63,6 +65,30 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
         Query.of(getRawQuery(SELECT_ALL_QUERY)).query(resultSet -> SwingUtils.mapResultSetToTable(resultSet, table));
     }
 
+    public List<T> getFilteredAll() {
+        List<T> list = new ArrayList<>();
+
+        Query selectQuery;
+
+        if ( filter != null ) {
+            selectQuery = getFilterQuery(filter);
+        } else {
+            selectQuery = Query.of(getRawQuery(SELECT_ALL_QUERY));
+        }
+
+        selectQuery.query(resultSet -> {
+            try {
+                while (resultSet.next()) {
+                    modelFromResultSet(resultSet).ifPresent(list::add);
+                }
+            } catch (SQLException e) {
+                DBConnection.printError(e);
+            }
+        });
+
+        return list;
+    }
+
     public List<T> getAll() {
         List<T> list = new ArrayList<>();
 
@@ -79,6 +105,8 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
         return list;
     }
 
+    protected abstract Query getFilterQuery(T filter);
+
     protected abstract Optional<T> modelFromResultSet(ResultSet result) throws SQLException;
 
     protected void query(String queryName, Object... parameters) {
@@ -87,5 +115,10 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
 
     protected Query buildQuery(String queryName, Object... parameters) {
         return Query.of(getRawQuery(queryName), parameters);
+    }
+
+    @Override
+    public void filter(T entity) {
+        this.filter = entity;
     }
 }

@@ -1,0 +1,1 @@
+SELECT * FROM `trainlines` WHERE line_start = ? OR line_distance = ? OR line_stop = ?;

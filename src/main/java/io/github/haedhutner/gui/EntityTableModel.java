@@ -13,6 +13,12 @@ public abstract class EntityTableModel<T> extends AbstractTableModel {
     private List<String> header = new ArrayList<>();
     protected List<T> entities = new ArrayList<>();
 
+    public EntityTableModel( Class<T> clazz, List<T> entities, List<String> header ) {
+        this.clazz = clazz;
+        this.entities = entities;
+        this.header = header;
+    }
+
     public EntityTableModel(Class<T> clazz, ResultSet rs, List<String> header) {
         this.clazz = clazz;
         this.header = header;

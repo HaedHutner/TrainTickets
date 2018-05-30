@@ -1,0 +1,1 @@
+SELECT * FROM `trains` WHERE train_departingat = ? OR train_route = ?;

@@ -5,7 +5,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import io.github.haedhutner.db.DBManager;
 import io.github.haedhutner.entity.Line;
-import io.github.haedhutner.gui.CreateOrUpdateDialog;
+import io.github.haedhutner.gui.CreateFilterUpdateDialog;
 import io.github.haedhutner.managers.LineManager;
 
 import javax.swing.*;
@@ -14,7 +14,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-public class CreateOrUpdateTrainLine extends JDialog implements CreateOrUpdateDialog<Line, Integer> {
+public class CreateOrUpdateTrainLine extends JDialog implements CreateFilterUpdateDialog<Line, Integer> {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
@@ -53,6 +53,7 @@ public class CreateOrUpdateTrainLine extends JDialog implements CreateOrUpdateDi
         dialog.buttonOK.setText("Create");
         dialog.setTitle("Create New Train Line");
         dialog.buttonOK.addActionListener(e -> dialog.createOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
         dialog.setVisible(true);
         return dialog;
     }
@@ -64,6 +65,18 @@ public class CreateOrUpdateTrainLine extends JDialog implements CreateOrUpdateDi
         dialog.setTitle("Update Train Line");
         dialog.setEntity(line);
         dialog.buttonOK.addActionListener(e -> dialog.updateOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
+        dialog.setVisible(true);
+        return dialog;
+    }
+
+    public static CreateOrUpdateTrainLine filter() {
+        CreateOrUpdateTrainLine dialog = new CreateOrUpdateTrainLine();
+        dialog.idField.setEnabled(false);
+        dialog.buttonOK.setText("Filter");
+        dialog.setTitle("Filter Train Lines");
+        dialog.buttonOK.addActionListener(e -> dialog.filterOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.filterCancel());
         dialog.setVisible(true);
         return dialog;
     }

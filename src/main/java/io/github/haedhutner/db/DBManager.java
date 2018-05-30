@@ -48,4 +48,5 @@ public interface DBManager<T extends Entity<ID>, ID> {
      */
     void delete(T object);
 
+    void filter(T entity);
 }

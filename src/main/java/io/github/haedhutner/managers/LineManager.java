@@ -2,8 +2,8 @@ package io.github.haedhutner.managers;
 
 import io.github.haedhutner.db.AbstractManager;
 import io.github.haedhutner.db.DBConnection;
+import io.github.haedhutner.db.Query;
 import io.github.haedhutner.entity.Line;
-import io.github.haedhutner.entity.Train;
 import io.github.haedhutner.gui.lines.TrainlinesTableModel;
 
 import javax.swing.*;
@@ -15,15 +15,19 @@ public class LineManager extends AbstractManager<Line, Integer> {
 
     private static final LineManager instance = new LineManager();
 
-    private static final String SELECT_ROUTE_QUERY = "selectRoute";
-
     protected LineManager() {
         super("sql/lineManager");
     }
 
     @Override
     public void mapTo(JTable table) {
-        DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainlinesTableModel(resultSet))));
+        table.setModel(new TrainlinesTableModel(getFilteredAll()));
+        //DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainlinesTableModel(resultSet))));
+    }
+
+    @Override
+    protected Query getFilterQuery(Line filter) {
+        return Query.of(getRawQuery(FILTER_QUERY), filter.getStart(), filter.getDistance(), filter.getStop());
     }
 
     @Override
@@ -38,17 +42,19 @@ public class LineManager extends AbstractManager<Line, Integer> {
 
         @Override
     public Optional<Line> select(Integer id) {
-        return buildQuery(SELECT_QUERY, id).queryResult(resultSet -> {
-            try {
-                resultSet.next();
-                Optional<Line> line = modelFromResultSet(resultSet);
-                if ( line.isPresent() ) return line.get();
-            } catch (SQLException e) {
-                DBConnection.printError(e);
-            }
+        try(final DBConnection connection = new DBConnection()) {
+            Optional<ResultSet> resultSet = connection.resultQuery(getRawQuery(SELECT_QUERY), id);
 
-            return null;
-        });
+            if ( resultSet.isPresent() ) {
+                ResultSet rs = resultSet.get();
+                rs.next();
+                return modelFromResultSet(rs);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return Optional.empty();
     }
 
     @Override
@@ -64,21 +70,6 @@ public class LineManager extends AbstractManager<Line, Integer> {
     @Override
     public void delete(Line line) {
         query(DELETE_QUERY, line.getId());
-    }
-
-    public Optional<Line> getTrainRoute(Train train) {
-        return buildQuery(SELECT_ROUTE_QUERY, train.getId()).queryResult((resultSet) -> {
-
-            try {
-                resultSet.next();
-                Optional<Line> line = modelFromResultSet(resultSet);
-                if (line.isPresent()) return line.get();
-            } catch (SQLException e) {
-                DBConnection.printError(e);
-            }
-
-            return null;
-        });
     }
 
     public static LineManager getInstance() {

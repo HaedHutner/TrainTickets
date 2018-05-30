@@ -7,13 +7,22 @@ import io.github.haedhutner.managers.TrainManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 
 public class TrainsTableModel extends EntityTableModel<Train> {
     public TrainsTableModel(ResultSet rs) {
         super(Train.class, rs, Arrays.asList(
                 "Id",
-                "Departs",
-                "Route"
+                "Route",
+                "Departs"
+        ));
+    }
+
+    public TrainsTableModel(List<Train> trains) {
+        super(Train.class, trains, Arrays.asList(
+                "Id",
+                "Route",
+                "Departs"
         ));
     }
 

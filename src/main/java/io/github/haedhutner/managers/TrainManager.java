@@ -1,11 +1,13 @@
 package io.github.haedhutner.managers;
 
 import io.github.haedhutner.db.AbstractManager;
+import io.github.haedhutner.db.Query;
 import io.github.haedhutner.entity.Train;
+import io.github.haedhutner.gui.trains.TrainsTableModel;
 
+import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -22,19 +24,28 @@ public class TrainManager extends AbstractManager<Train,Integer> {
     }
 
     @Override
+    public void mapTo(JTable table) {
+        table.setModel(new TrainsTableModel(getFilteredAll()));
+        //DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainsTableModel(resultSet))));
+    }
+
+    @Override
     public Optional<Train> modelFromResultSet(ResultSet result) throws SQLException {
         Integer id = result.getInt("train_id");
-        LocalDateTime departure = result.getTimestamp("train_departingAt").toLocalDateTime();
 
-        Train train = new Train(id, departure);
-        LineManager.getInstance().getTrainRoute(train).ifPresent(train::setRoute);
+        LocalDateTime train_departingAt = result.getTimestamp("train_departingAt").toLocalDateTime();
+
+        Integer line_id = result.getInt("train_route");
+
+        Train train = new Train(id, train_departingAt);
+        LineManager.getInstance().select(line_id).ifPresent(train::setRoute);
 
         return Optional.of(train);
     }
 
     @Override
     public void insert(Train object) {
-        query(INSERT_QUERY, Timestamp.valueOf(object.getDepartureTime()), object.getRoute());
+        query(INSERT_QUERY, object.getDepartureTime(), object.getRoute().getId());
     }
 
     @Override
@@ -45,6 +56,11 @@ public class TrainManager extends AbstractManager<Train,Integer> {
     @Override
     public void delete(Train object) {
         query(DELETE_QUERY, object.getId());
+    }
+
+    @Override
+    public Query getFilterQuery(Train entity) {
+        return Query.of(getRawQuery(FILTER_QUERY), entity.getDepartureTime(), entity.getRoute().getId());
     }
 
     @Override
