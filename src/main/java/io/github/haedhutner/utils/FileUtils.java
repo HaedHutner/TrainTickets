@@ -8,12 +8,14 @@ public final class FileUtils {
     public static String resourceToString(String resourcePath) {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourcePath);
 
-        if ( in == null ) throw new ResourceNotFoundException(resourcePath);
+        if (in == null) throw new ResourceNotFoundException(resourcePath);
 
         StringBuilder builder = new StringBuilder();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
-            reader.lines().forEach(line -> { if ( !line.isEmpty() ) builder.append(line).append("\n"); });
+            reader.lines().forEach(line -> {
+                if (!line.isEmpty()) builder.append(line).append("\n");
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -10,15 +10,16 @@ public class Train implements Entity<Integer> {
 
     private LocalDateTime departs;
 
-    public Train() {}
+    public Train() {
+    }
 
-    public Train ( int id, Line route ) {
+    public Train(int id, Line route) {
         this.id = id;
         this.route = route;
         this.departs = LocalDateTime.now();
     }
 
-    public Train ( int id, Line route, LocalDateTime departs ) {
+    public Train(int id, Line route, LocalDateTime departs) {
         this.id = id;
         this.route = route;
         this.departs = departs;
@@ -33,8 +34,16 @@ public class Train implements Entity<Integer> {
         return route;
     }
 
+    public void setRoute(Line route) {
+        this.route = route;
+    }
+
     public LocalDateTime getDepartureTime() {
         return departs;
+    }
+
+    public void setDepartureTime(LocalDateTime departs) {
+        this.departs = departs;
     }
 
     @Override
@@ -45,13 +54,5 @@ public class Train implements Entity<Integer> {
     @Override
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public void setRoute(Line route) {
-        this.route = route;
-    }
-
-    public void setDepartureTime(LocalDateTime departs) {
-        this.departs = departs;
     }
 }

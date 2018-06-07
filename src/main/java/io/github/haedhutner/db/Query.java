@@ -10,12 +10,12 @@ public class Query {
     private String query;
     private Object[] params;
 
-    private Query ( String query, Object... params ) {
+    private Query(String query, Object... params) {
         this.query = query;
         this.params = params;
     }
 
-    public static Query of ( String query, Object... params ) {
+    public static Query of(String query, Object... params) {
         return new Query(query, params);
     }
 
@@ -24,7 +24,7 @@ public class Query {
     }
 
     public void query(Consumer<ResultSet> action) {
-        try(DBConnection connection = new DBConnection()) {
+        try (DBConnection connection = new DBConnection()) {
             connection.resultQuery(query, params).ifPresent(action);
         }
     }

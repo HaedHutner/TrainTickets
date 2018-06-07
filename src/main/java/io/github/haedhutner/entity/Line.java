@@ -4,25 +4,25 @@ public class Line implements Entity<Integer> {
 
     private Integer id;
 
-    private String stationStart;
+    private String from;
     private double distance;
-    private String stationStop;
+    private String to;
 
     public Line(int line_id) {
         this.id = line_id;
     }
 
     public Line(String start, double distance, String stop) {
-        this.stationStart = start;
+        this.from = start;
         this.distance = distance;
-        this.stationStop = stop;
+        this.to = stop;
     }
 
     public Line(int id, String start, double distance, String stop) {
         this.id = id;
-        this.stationStart = start;
+        this.from = start;
         this.distance = distance;
-        this.stationStop = stop;
+        this.to = stop;
     }
 
     @Override
@@ -30,37 +30,37 @@ public class Line implements Entity<Integer> {
         return id;
     }
 
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     public String getStart() {
-        return stationStart;
+        return from;
     }
 
     public double getDistance() {
         return distance;
     }
 
-    public String getStop() {
-        return stationStop;
-    }
-
-    @Override
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public void setStationStart(String stationStart) {
-        this.stationStart = stationStart;
-    }
-
     public void setDistance(double distance) {
         this.distance = distance;
     }
 
+    public String getStop() {
+        return to;
+    }
+
+    public void setStationStart(String stationStart) {
+        this.from = stationStart;
+    }
+
     public void setStationStop(String stationStop) {
-        this.stationStop = stationStop;
+        this.to = stationStop;
     }
 
     @Override
     public String toString() {
-        return stationStart + " --" + distance + "--> " + stationStop;
+        return from + " --" + distance + "--> " + to;
     }
 }

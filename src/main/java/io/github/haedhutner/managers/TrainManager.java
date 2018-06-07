@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-public class TrainManager extends AbstractManager<Train,Integer> {
+public class TrainManager extends AbstractManager<Train, Integer> {
 
     private static TrainManager instance = new TrainManager();
 
@@ -26,7 +26,6 @@ public class TrainManager extends AbstractManager<Train,Integer> {
     @Override
     public void mapTo(JTable table) {
         table.setModel(new TrainsTableModel(getFilteredAll()));
-        //DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainsTableModel(resultSet))));
     }
 
     @Override

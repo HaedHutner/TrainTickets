@@ -19,10 +19,13 @@ public class LineManager extends AbstractManager<Line, Integer> {
         super("sql/lineManager");
     }
 
+    public static LineManager getInstance() {
+        return instance;
+    }
+
     @Override
     public void mapTo(JTable table) {
         table.setModel(new TrainlinesTableModel(getFilteredAll()));
-        //DBConnection.exec(connection -> connection.resultQuery(getRawQuery(SELECT_ALL_QUERY)).ifPresent(resultSet -> table.setModel(new TrainlinesTableModel(resultSet))));
     }
 
     @Override
@@ -40,12 +43,12 @@ public class LineManager extends AbstractManager<Line, Integer> {
         return Optional.of(new Line(id, from, distance, to));
     }
 
-        @Override
+    @Override
     public Optional<Line> select(Integer id) {
-        try(final DBConnection connection = new DBConnection()) {
+        try (final DBConnection connection = new DBConnection()) {
             Optional<ResultSet> resultSet = connection.resultQuery(getRawQuery(SELECT_QUERY), id);
 
-            if ( resultSet.isPresent() ) {
+            if (resultSet.isPresent()) {
                 ResultSet rs = resultSet.get();
                 rs.next();
                 return modelFromResultSet(rs);
@@ -70,10 +73,6 @@ public class LineManager extends AbstractManager<Line, Integer> {
     @Override
     public void delete(Line line) {
         query(DELETE_QUERY, line.getId());
-    }
-
-    public static LineManager getInstance() {
-        return instance;
     }
 
 }

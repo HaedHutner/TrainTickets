@@ -16,14 +16,13 @@ import java.util.*;
  * An abstract implementation of DBManager where the SQL queries are to be stored under a specific directory within
  * the jar resources and retrieved during runtime based on their file names.
  */
-public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBManager<T,ID> {
+public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBManager<T, ID> {
 
     protected static final String CREATE_QUERY = "createTable";
     protected static final String INSERT_QUERY = "insert";
     protected static final String UPDATE_QUERY = "update";
     protected static final String SELECT_QUERY = "select";
     protected static final String DELETE_QUERY = "delete";
-    protected static final String UPSERT_QUERY = "upsert";
     protected static final String FILTER_QUERY = "filter";
     protected static final String SELECT_ALL_QUERY = "selectAll";
 
@@ -53,7 +52,7 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
         DBConnection.exec(dbConnection -> dbConnection.noResultQuery(getRawQuery(CREATE_QUERY)));
     }
 
-    public Map<String,String> getRawQueries() {
+    public Map<String, String> getRawQueries() {
         return queries;
     }
 
@@ -70,7 +69,7 @@ public abstract class AbstractManager<T extends Entity<ID>, ID> implements DBMan
 
         Query selectQuery;
 
-        if ( filter != null ) {
+        if (filter != null) {
             selectQuery = getFilterQuery(filter);
         } else {
             selectQuery = Query.of(getRawQuery(SELECT_ALL_QUERY));

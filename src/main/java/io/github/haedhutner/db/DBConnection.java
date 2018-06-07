@@ -1,5 +1,6 @@
 package io.github.haedhutner.db;
 
+import io.github.haedhutner.config.ApplicationConfig;
 import io.github.haedhutner.utils.FileUtils;
 
 import java.sql.*;
@@ -8,32 +9,19 @@ import java.util.function.Consumer;
 
 public final class DBConnection implements AutoCloseable {
 
-    public enum Type {
-        MYSQL,
-        H2
-    }
-
-    private static Type defaultType = Type.H2;
-
     private Connection connection;
     private PreparedStatement statement;
     private ResultSet result;
 
     public DBConnection() {
-        this(getDefaultType());
+        this(DBConnection.Type.valueOf(ApplicationConfig.getInstance().getDatabaseType()));
     }
 
     public DBConnection(Type type) {
         try {
-            String connectionString = String.format("jdbc:h2:tcp://localhost/D:/databases/trains;USER=%s;PASSWORD=%s", "sa", "");
-            if (type == Type.MYSQL) {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                connectionString = String.format("jdbc:mysql://localhost/trainsDatabase?user=%s&password=%s&useSSL=false", "root", "");
-            } else if (type == Type.H2) {
-                Class.forName("org.h2.Driver");
-                connectionString = String.format("jdbc:h2:tcp://localhost/D:/databases/trains;USER=%s;PASSWORD=%s", "sa", "");
-            }
-            connection = DriverManager.getConnection(connectionString);
+            if (type == Type.MYSQL) Class.forName("com.mysql.cj.jdbc.Driver");
+            else if (type == Type.H2) Class.forName("org.h2.Driver");
+            connection = DriverManager.getConnection(ApplicationConfig.getInstance().getConnectionString());
         } catch (ClassNotFoundException e) {
             // TODO
             e.printStackTrace();
@@ -42,18 +30,17 @@ public final class DBConnection implements AutoCloseable {
         }
     }
 
-    public static Type getDefaultType() {
-        return defaultType;
-    }
-
-    public static void setDefaultType(Type defaultType) {
-        DBConnection.defaultType = defaultType;
-    }
-
     public static void exec(Consumer<DBConnection> consumer) {
-        try (DBConnection connection = new DBConnection(defaultType)) {
+        try (DBConnection connection = new DBConnection()) {
             consumer.accept(connection);
         }
+    }
+
+    public static void printError(SQLException e) {
+        System.out.println("SQLException: " + e.getMessage());
+        System.out.println("SQLState: " + e.getSQLState());
+        System.out.println("VendorError: " + e.getErrorCode());
+        e.printStackTrace();
     }
 
     public Optional<PreparedStatement> constructStatement(String sqlStatement, Object... parameters) {
@@ -107,10 +94,19 @@ public final class DBConnection implements AutoCloseable {
         }
     }
 
-    public static void printError(SQLException e) {
-        System.out.println("SQLException: " + e.getMessage());
-        System.out.println("SQLState: " + e.getSQLState());
-        System.out.println("VendorError: " + e.getErrorCode());
-        e.printStackTrace();
+    public enum Type {
+        MYSQL("jdbc:mysql://%s?user=%s&password=%s&useSSL=false"),
+        H2("jdbc:h2:tcp://%s;USER=%s;PASSWORD=%s");
+
+        private String name;
+
+        Type(String name) {
+            this.name = name;
+        }
+
+        public String getTemplate() {
+            return this.name;
+        }
+
     }
 }

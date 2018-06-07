@@ -12,13 +12,13 @@ import java.util.Map;
 public class ResultSetTableModel extends AbstractTableModel {
 
     private List<String> header = new ArrayList<>();
-    private List<Map<Integer,Object>> data = new ArrayList<>();
+    private List<Map<Integer, Object>> data = new ArrayList<>();
 
     public ResultSetTableModel(ResultSet rs) {
         try {
             setHeader(rs);
             setData(rs);
-        } catch ( SQLException e ) {
+        } catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
@@ -28,8 +28,8 @@ public class ResultSetTableModel extends AbstractTableModel {
     private void setHeader(ResultSet rs) throws SQLException {
         ResultSetMetaData meta = rs.getMetaData();
 
-        for ( int i = 1; i <= meta.getColumnCount(); i++ ) {
-            header.add(i-1, meta.getColumnName(i));
+        for (int i = 1; i <= meta.getColumnCount(); i++) {
+            header.add(i - 1, meta.getColumnName(i));
         }
     }
 
@@ -40,7 +40,7 @@ public class ResultSetTableModel extends AbstractTableModel {
         while (rs.next()) {
             Map<Integer, Object> row = new HashMap<>(columns);
             for (int i = 1; i <= columns; ++i) {
-                row.put(i-1, rs.getObject(i));
+                row.put(i - 1, rs.getObject(i));
             }
             data.add(row);
         }
@@ -55,7 +55,7 @@ public class ResultSetTableModel extends AbstractTableModel {
     }
 
     public Object getValueAt(int rowIndex, int columnIndex) {
-        if ( data.size() < rowIndex ) return null;
+        if (data.size() < rowIndex) return null;
         return data.get(rowIndex).get(columnIndex);
     }
 

@@ -15,6 +15,8 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Vector;
 
 public class CreateOrUpdateTrain extends JDialog implements CreateFilterUpdateDialog<Train, Integer> {
@@ -114,8 +116,16 @@ public class CreateOrUpdateTrain extends JDialog implements CreateFilterUpdateDi
         }
 
         Line selectedLine = (Line) routeCombo.getSelectedItem();
-        // TODO: Get date from field
-        return new Train(id, selectedLine);
+
+        LocalDateTime ldt;
+
+        try {
+            ldt = LocalDateTime.parse(departureTextField.getText());
+        } catch (DateTimeParseException e) {
+            return new Train(id, selectedLine);
+        }
+
+        return new Train(id, selectedLine, ldt);
     }
 
     @Override

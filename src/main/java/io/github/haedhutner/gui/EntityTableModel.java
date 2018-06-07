@@ -8,20 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class EntityTableModel<T> extends AbstractTableModel {
-    private Class<T> clazz;
 
-    private List<String> header = new ArrayList<>();
     protected List<T> entities = new ArrayList<>();
 
-    public EntityTableModel( Class<T> clazz, List<T> entities, List<String> header ) {
+    private Class<T> clazz;
+
+    public EntityTableModel(Class<T> clazz, List<T> entities) {
         this.clazz = clazz;
         this.entities = entities;
-        this.header = header;
     }
 
-    public EntityTableModel(Class<T> clazz, ResultSet rs, List<String> header) {
+    public EntityTableModel(Class<T> clazz, ResultSet rs) {
         this.clazz = clazz;
-        this.header = header;
         try {
             setData(rs);
         } catch (SQLException e) {
@@ -35,7 +33,7 @@ public abstract class EntityTableModel<T> extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return header.size();
+        return clazz.getDeclaredFields().length;
     }
 
     @Override
@@ -64,7 +62,8 @@ public abstract class EntityTableModel<T> extends AbstractTableModel {
 
     @Override
     public String getColumnName(int columnIndex) {
-        return header.get(columnIndex);
+        Field field = clazz.getDeclaredFields()[columnIndex];
+        return field.getName();
     }
 
     public T getAt(int row) {

@@ -23,7 +23,7 @@ public interface CreateFilterUpdateDialog<T extends Entity<ID>, ID> {
 
     default void filterOk() {
         T entity = getEntity();
-        if ( entity == null ) return;
+        if (entity == null) return;
         getManager().filter(entity);
         dispose();
         ApplicationGUI.getInstance().updateTables();
