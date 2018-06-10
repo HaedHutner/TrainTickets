@@ -5,11 +5,12 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import io.github.haedhutner.entity.Line;
 import io.github.haedhutner.entity.Train;
-import io.github.haedhutner.gui.lines.CreateOrUpdateTrainLine;
+import io.github.haedhutner.gui.lines.LineDialog;
 import io.github.haedhutner.gui.lines.TrainlinesTableModel;
-import io.github.haedhutner.gui.trains.CreateOrUpdateTrain;
+import io.github.haedhutner.gui.trains.TrainDialog;
 import io.github.haedhutner.gui.trains.TrainsTableModel;
 import io.github.haedhutner.managers.LineManager;
+import io.github.haedhutner.managers.TicketManager;
 import io.github.haedhutner.managers.TrainManager;
 
 import javax.swing.*;
@@ -27,13 +28,19 @@ public class ApplicationGUI extends JFrame {
     private JButton newTrainButton;
     private JButton updateTrainButton;
     private JButton deleteTrainButton;
-    private JButton newTrainLineButton1;
+
+    private JButton newTrainLine;
     private JButton deleteTrainLineButton;
     private JButton updateTrainLineButton;
 
     private JPanel mainContentPanel;
     private JButton filterTrainLines;
     private JButton filterTrainButton;
+    private JTable ticketsTable;
+    private JButton buyTicketButton;
+    private JButton deleteTicketButton;
+    private JButton updateTicketButton;
+    private JButton filterTicketsButton;
 
     private ApplicationGUI() {
         super.setTitle("Train Tickets");
@@ -46,33 +53,15 @@ public class ApplicationGUI extends JFrame {
         LineManager.getInstance().init();
         TrainManager.getInstance().init();
 
-        newTrainLineButton1.addActionListener(event -> CreateOrUpdateTrainLine.create());
-        deleteTrainLineButton.addActionListener(event -> {
-            if (trainLinesTable.getSelectedRow() == -1 || trainLinesTable.getSelectedColumn() == -1) return;
-            TrainlinesTableModel model = (TrainlinesTableModel) trainLinesTable.getModel();
-            DeleteDialog.open(model.getAt(trainLinesTable.getSelectedRow()), LineManager.getInstance());
-        });
-        updateTrainLineButton.addActionListener(event -> {
-            if (trainLinesTable.getSelectedRow() == -1 || trainLinesTable.getSelectedColumn() == -1) return;
-            TrainlinesTableModel model = (TrainlinesTableModel) trainLinesTable.getModel();
-            Line line = model.getAt(trainLinesTable.getSelectedRow());
-            CreateOrUpdateTrainLine.update(line);
-        });
-        filterTrainLines.addActionListener(event -> CreateOrUpdateTrainLine.filter());
+        newTrainLine.addActionListener(event -> LineDialog.create());
+        deleteTrainLineButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedLine(), LineManager.getInstance()));
+        updateTrainLineButton.addActionListener(event -> LineDialog.update(getSelectedLine()));
+        filterTrainLines.addActionListener(event -> LineDialog.filter());
 
-        newTrainButton.addActionListener(event -> CreateOrUpdateTrain.create());
-        deleteTrainButton.addActionListener(event -> {
-            if (trainsTable.getSelectedRow() == -1 || trainsTable.getSelectedColumn() == -1) return;
-            TrainsTableModel model = (TrainsTableModel) trainsTable.getModel();
-            DeleteDialog.open(model.getAt(trainsTable.getSelectedRow()), TrainManager.getInstance());
-        });
-        updateTrainButton.addActionListener(event -> {
-            if (trainsTable.getSelectedRow() == -1 || trainsTable.getSelectedColumn() == -1) return;
-            TrainsTableModel model = (TrainsTableModel) trainsTable.getModel();
-            Train train = model.getAt(trainsTable.getSelectedRow());
-            CreateOrUpdateTrain.update(train);
-        });
-        filterTrainButton.addActionListener(event -> CreateOrUpdateTrain.filter());
+        newTrainButton.addActionListener(event -> TrainDialog.create());
+        deleteTrainButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedTrain(), TrainManager.getInstance()));
+        updateTrainButton.addActionListener(event -> TrainDialog.update(getSelectedTrain()));
+        filterTrainButton.addActionListener(event -> TrainDialog.filter());
 
         updateTables();
     }
@@ -84,6 +73,7 @@ public class ApplicationGUI extends JFrame {
     public void updateTables() {
         updateTrainsTable();
         updateLinesTable();
+        updateTicketsTable();
     }
 
     public void updateLinesTable() {
@@ -92,6 +82,22 @@ public class ApplicationGUI extends JFrame {
 
     public void updateTrainsTable() {
         TrainManager.getInstance().mapTo(trainsTable);
+    }
+
+    public void updateTicketsTable() {
+        TicketManager.getInstance().mapTo(ticketsTable);
+    }
+
+    public Line getSelectedLine() {
+        if (trainLinesTable.getSelectedRow() == -1) return null;
+        TrainlinesTableModel model = (TrainlinesTableModel) trainLinesTable.getModel();
+        return model.getAt(trainLinesTable.getSelectedRow());
+    }
+
+    public Train getSelectedTrain() {
+        if (trainsTable.getSelectedRow() == -1) return null;
+        TrainsTableModel model = (TrainsTableModel) trainsTable.getModel();
+        return model.getAt(trainsTable.getSelectedRow());
     }
 
     {
@@ -143,9 +149,9 @@ public class ApplicationGUI extends JFrame {
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridLayoutManager(5, 1, new Insets(0, 0, 0, 0), -1, -1));
         panel3.add(panel4, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
-        newTrainLineButton1 = new JButton();
-        newTrainLineButton1.setText("New Train Line");
-        panel4.add(newTrainLineButton1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        newTrainLine = new JButton();
+        newTrainLine.setText("New Train Line");
+        panel4.add(newTrainLine, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
         final Spacer spacer2 = new Spacer();
         panel4.add(spacer2, new GridConstraints(4, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         deleteTrainLineButton = new JButton();
@@ -161,6 +167,27 @@ public class ApplicationGUI extends JFrame {
         panel3.add(scrollPane2, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
         trainLinesTable = new JTable();
         scrollPane2.setViewportView(trainLinesTable);
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayoutManager(7, 2, new Insets(0, 0, 0, 0), -1, -1));
+        mainTabPanel.addTab("Tickets", panel5);
+        final JScrollPane scrollPane3 = new JScrollPane();
+        panel5.add(scrollPane3, new GridConstraints(0, 0, 7, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        ticketsTable = new JTable();
+        scrollPane3.setViewportView(ticketsTable);
+        buyTicketButton = new JButton();
+        buyTicketButton.setText("Buy Ticket");
+        panel5.add(buyTicketButton, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final Spacer spacer3 = new Spacer();
+        panel5.add(spacer3, new GridConstraints(4, 1, 2, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_VERTICAL, 1, GridConstraints.SIZEPOLICY_WANT_GROW, null, null, null, 0, false));
+        deleteTicketButton = new JButton();
+        deleteTicketButton.setText("Delete Ticket");
+        panel5.add(deleteTicketButton, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        updateTicketButton = new JButton();
+        updateTicketButton.setText("Update Ticket");
+        panel5.add(updateTicketButton, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        filterTicketsButton = new JButton();
+        filterTicketsButton.setText("Filter Tickets");
+        panel5.add(filterTicketsButton, new GridConstraints(3, 1, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

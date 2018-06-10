@@ -8,22 +8,7 @@ public class Line implements Entity<Integer> {
     private double distance;
     private String to;
 
-    public Line(int line_id) {
-        this.id = line_id;
-    }
-
-    public Line(String start, double distance, String stop) {
-        this.from = start;
-        this.distance = distance;
-        this.to = stop;
-    }
-
-    public Line(int id, String start, double distance, String stop) {
-        this.id = id;
-        this.from = start;
-        this.distance = distance;
-        this.to = stop;
-    }
+    public Line() {}
 
     @Override
     public Integer getId() {

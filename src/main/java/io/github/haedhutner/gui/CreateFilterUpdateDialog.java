@@ -14,6 +14,7 @@ public interface CreateFilterUpdateDialog<T extends Entity<ID>, ID> {
     }
 
     default void updateOk() {
+        updateEntity();
         T entity = getEntity();
         if (entity == null) return;
         getManager().update(entity);
@@ -37,6 +38,13 @@ public interface CreateFilterUpdateDialog<T extends Entity<ID>, ID> {
     DBManager<T, ID> getManager();
 
     T getEntity();
+
+    void updateEntity();
+
+    default void updateEntity(T entity) {
+        setEntity(entity);
+        updateEntity();
+    }
 
     void setEntity(T entity);
 

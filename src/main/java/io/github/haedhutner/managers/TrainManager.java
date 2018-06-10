@@ -8,7 +8,6 @@ import io.github.haedhutner.gui.trains.TrainsTableModel;
 import javax.swing.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class TrainManager extends AbstractManager<Train, Integer> {
@@ -30,14 +29,12 @@ public class TrainManager extends AbstractManager<Train, Integer> {
 
     @Override
     public Optional<Train> modelFromResultSet(ResultSet result) throws SQLException {
-        Integer id = result.getInt("train_id");
+        Train train = new Train();
 
-        LocalDateTime train_departingAt = result.getTimestamp("train_departingAt").toLocalDateTime();
+        train.setId(result.getInt("train_id"));
+        train.setDepartureTime(result.getTimestamp("train_departingAt").toLocalDateTime());
 
-        Integer line_id = result.getInt("train_route");
-
-        Train train = new Train(id, train_departingAt);
-        LineManager.getInstance().select(line_id).ifPresent(train::setRoute);
+        LineManager.getInstance().select(result.getInt("train_route")).ifPresent(train::setRoute);
 
         return Optional.of(train);
     }

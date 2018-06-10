@@ -35,12 +35,14 @@ public class LineManager extends AbstractManager<Line, Integer> {
 
     @Override
     public Optional<Line> modelFromResultSet(ResultSet result) throws SQLException {
-        int id = result.getInt("line_id");
-        String from = result.getString("line_start");
-        double distance = result.getDouble("line_distance");
-        String to = result.getString("line_stop");
+        Line line = new Line();
 
-        return Optional.of(new Line(id, from, distance, to));
+        line.setId(result.getInt("line_id"));
+        line.setStationStart(result.getString("line_start"));
+        line.setDistance(result.getDouble("line_distance"));
+        line.setStationStop(result.getString("line_stop"));
+
+        return Optional.of(line);
     }
 
     @Override

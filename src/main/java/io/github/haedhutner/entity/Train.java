@@ -13,23 +13,6 @@ public class Train implements Entity<Integer> {
     public Train() {
     }
 
-    public Train(int id, Line route) {
-        this.id = id;
-        this.route = route;
-        this.departs = LocalDateTime.now();
-    }
-
-    public Train(int id, Line route, LocalDateTime departs) {
-        this.id = id;
-        this.route = route;
-        this.departs = departs;
-    }
-
-    public Train(int id, LocalDateTime departure) {
-        this.id = id;
-        this.departs = departure;
-    }
-
     public Line getRoute() {
         return route;
     }
