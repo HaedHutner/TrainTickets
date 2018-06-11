@@ -1,0 +1,1 @@
+INSERT INTO `tickets` ( `ticket_train` ) VALUES ( ? );

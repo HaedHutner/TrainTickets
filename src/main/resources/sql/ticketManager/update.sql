@@ -1,0 +1,1 @@
+UPDATE `tickets` SET ticket_train = ? WHERE ticket_id = ?;

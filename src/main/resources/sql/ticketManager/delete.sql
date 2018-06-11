@@ -1,0 +1,1 @@
+DELETE FROM `tickets` WHERE ticket_id = ?;
