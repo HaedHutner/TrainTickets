@@ -2,6 +2,8 @@ package io.github.haedhutner.entity;
 
 public class Ticket implements Entity<Integer> {
 
+    public static double PRICE_PER_KILOMETER = 0.05d;
+
     private Integer id;
 
     private Double price;

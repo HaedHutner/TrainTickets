@@ -62,4 +62,12 @@ public class ResultSetTableModel extends AbstractTableModel {
     public String getColumnName(int columnIndex) {
         return header.get(columnIndex);
     }
+
+    public Map<String,Object> getAt(int row) {
+        Map<String,Object> result = new HashMap<>();
+
+        data.get(row).forEach( (k,v) -> result.put( header.get(k), v ));
+
+        return result;
+    }
 }

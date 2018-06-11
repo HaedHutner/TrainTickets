@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.Vector;
 
 public class TrainDialog extends JDialog implements CreateFilterUpdateDialog<Train, Integer> {
@@ -41,6 +42,8 @@ public class TrainDialog extends JDialog implements CreateFilterUpdateDialog<Tra
         routeCombo.setModel(new DefaultComboBoxModel<>(new Vector<>(LineManager.getInstance().getAll())));
 
         buttonCancel.addActionListener(e -> onCancel());
+
+        departureTextField.setText(LocalDateTime.now().toString());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -118,7 +121,16 @@ public class TrainDialog extends JDialog implements CreateFilterUpdateDialog<Tra
     public void updateEntity() {
         if (train == null) return;
         train.setRoute((Line) routeCombo.getSelectedItem());
-        train.setDepartureTime(LocalDateTime.parse(departureTextField.getText()));
+
+        LocalDateTime parsed;
+
+        try {
+            parsed = LocalDateTime.parse(departureTextField.getText());
+        } catch (DateTimeParseException e) {
+            parsed = LocalDateTime.now();
+        }
+
+        train.setDepartureTime(parsed);
     }
 
     @Override

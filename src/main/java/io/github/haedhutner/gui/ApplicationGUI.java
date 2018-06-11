@@ -4,9 +4,11 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import io.github.haedhutner.entity.Line;
+import io.github.haedhutner.entity.Ticket;
 import io.github.haedhutner.entity.Train;
 import io.github.haedhutner.gui.lines.LineDialog;
 import io.github.haedhutner.gui.lines.TrainlinesTableModel;
+import io.github.haedhutner.gui.ticket.TicketDialog;
 import io.github.haedhutner.gui.trains.TrainDialog;
 import io.github.haedhutner.gui.trains.TrainsTableModel;
 import io.github.haedhutner.managers.LineManager;
@@ -15,6 +17,7 @@ import io.github.haedhutner.managers.TrainManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Map;
 
 public class ApplicationGUI extends JFrame {
 
@@ -64,6 +67,11 @@ public class ApplicationGUI extends JFrame {
         updateTrainButton.addActionListener(event -> TrainDialog.update(getSelectedTrain()));
         filterTrainButton.addActionListener(event -> TrainDialog.filter());
 
+        buyTicketButton.addActionListener(event -> TicketDialog.create());
+        deleteTicketButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedTrain(), TrainManager.getInstance()));
+        updateTicketButton.addActionListener(event -> TicketDialog.update(getSelectedTicket()));
+        filterTicketsButton.addActionListener(event -> TicketDialog.filter());
+
         updateTables();
     }
 
@@ -99,6 +107,20 @@ public class ApplicationGUI extends JFrame {
         if (trainsTable.getSelectedRow() == -1) return null;
         TrainsTableModel model = (TrainsTableModel) trainsTable.getModel();
         return model.getAt(trainsTable.getSelectedRow());
+    }
+
+    public Ticket getSelectedTicket() {
+        if (ticketsTable.getSelectedRow() == -1) return null;
+        ResultSetTableModel model = (ResultSetTableModel) ticketsTable.getModel();
+
+        Map<String, Object> ticketData = model.getAt(ticketsTable.getSelectedRow());
+
+        Ticket ticket = new Ticket();
+
+        ticket.setPrice((Double) ticketData.get("ticket_price"));
+        TrainManager.getInstance().select((Integer) ticketData.get("ticket_train")).ifPresent(ticket::setTrain);
+
+        return ticket;
     }
 
     {

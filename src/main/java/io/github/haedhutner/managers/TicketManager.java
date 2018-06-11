@@ -26,7 +26,7 @@ public class TicketManager extends AbstractManager<Ticket,Integer> {
     }
 
     @Override
-    protected Optional<Ticket> modelFromResultSet(ResultSet result) throws SQLException {
+    public Optional<Ticket> modelFromResultSet(ResultSet result) throws SQLException {
         Ticket ticket = new Ticket();
 
         ticket.setPrice(result.getDouble("ticket_price"));

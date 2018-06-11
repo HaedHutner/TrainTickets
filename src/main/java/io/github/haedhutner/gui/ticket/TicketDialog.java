@@ -5,26 +5,39 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.intellij.uiDesigner.core.Spacer;
 import io.github.haedhutner.db.DBManager;
 import io.github.haedhutner.entity.Ticket;
+import io.github.haedhutner.entity.Train;
 import io.github.haedhutner.gui.CreateFilterUpdateDialog;
 import io.github.haedhutner.managers.TicketManager;
+import io.github.haedhutner.managers.TrainManager;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Vector;
 
 public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ticket, Integer> {
+
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
 
-    public TicketDialog() {
+    private JSpinner idSpinner;
+    private JComboBox<Train> trainComboBox;
+    private JSpinner priceSpinner;
+
+    private Ticket ticket;
+
+    private TicketDialog() {
+        idSpinner.setModel(new SpinnerNumberModel());
+        idSpinner.setEnabled(false);
         setContentPane(contentPane);
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
-
-        buttonOK.addActionListener(e -> onOK());
-
-        buttonCancel.addActionListener(e -> onCancel());
+        setResizable(false);
+        setMinimumSize(new Dimension(600, 200));
+        setPreferredSize(contentPane.getMinimumSize());
 
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -34,18 +47,57 @@ public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ti
             }
         });
 
+        trainComboBox.setModel(new DefaultComboBoxModel<>(new Vector<>(TrainManager.getInstance().getAll())));
+
+        trainComboBox.addActionListener(e -> {
+            Train train = (Train) trainComboBox.getSelectedItem();
+            if (train == null) return;
+            priceSpinner.setValue(train.getRoute().getDistance() * Ticket.PRICE_PER_KILOMETER);
+        });
+
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
+    public static TicketDialog create() {
+        TicketDialog dialog = new TicketDialog();
+
+        dialog.buttonOK.setText("Create");
+        dialog.setTitle("Purchase Ticket");
+
+        dialog.buttonOK.addActionListener(e -> dialog.createOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
+
+        dialog.setVisible(true);
+        return dialog;
     }
 
-    private void onCancel() {
-        // add your code here if necessary
-        dispose();
+    public static TicketDialog update(Ticket train) {
+        TicketDialog dialog = new TicketDialog();
+
+        dialog.buttonOK.setText("Update");
+        dialog.setTitle("Update Ticket");
+
+        dialog.setEntity(train);
+
+        dialog.buttonOK.addActionListener(e -> dialog.updateOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.onCancel());
+
+        dialog.setVisible(true);
+        return dialog;
+    }
+
+    public static TicketDialog filter() {
+        TicketDialog dialog = new TicketDialog();
+
+        dialog.buttonOK.setText("Filter");
+        dialog.setTitle("Filter Tickets");
+
+        dialog.buttonOK.addActionListener(e -> dialog.filterOk());
+        dialog.buttonCancel.addActionListener(e -> dialog.filterCancel());
+
+        dialog.setVisible(true);
+        return dialog;
     }
 
     @Override
@@ -53,19 +105,29 @@ public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ti
         return TicketManager.getInstance();
     }
 
+    public void onCancel() {
+        dispose();
+    }
+
     @Override
     public Ticket getEntity() {
-        return null;
+        if (ticket != null) return ticket;
+        else {
+            ticket = new Ticket();
+            updateEntity();
+            return ticket;
+        }
     }
 
     @Override
     public void updateEntity() {
-
+        ticket.setTrain((Train) trainComboBox.getSelectedItem());
+        ticket.setPrice((Double) priceSpinner.getValue());
     }
 
     @Override
     public void setEntity(Ticket entity) {
-
+        this.ticket = entity;
     }
 
     {
@@ -102,6 +164,24 @@ public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ti
         final JPanel panel3 = new JPanel();
         panel3.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
         contentPane.add(panel3, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(3, 2, new Insets(0, 0, 0, 0), -1, -1));
+        panel3.add(panel4, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, null, null, 0, false));
+        final JLabel label1 = new JLabel();
+        label1.setText("Id");
+        panel4.add(label1, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        idSpinner = new JSpinner();
+        panel4.add(idSpinner, new GridConstraints(0, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label2 = new JLabel();
+        label2.setText("Train");
+        panel4.add(label2, new GridConstraints(1, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        trainComboBox = new JComboBox();
+        panel4.add(trainComboBox, new GridConstraints(1, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        final JLabel label3 = new JLabel();
+        label3.setText("Price");
+        panel4.add(label3, new GridConstraints(2, 0, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_NONE, GridConstraints.SIZEPOLICY_FIXED, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
+        priceSpinner = new JSpinner();
+        panel4.add(priceSpinner, new GridConstraints(2, 1, 1, 1, GridConstraints.ANCHOR_WEST, GridConstraints.FILL_HORIZONTAL, GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_FIXED, null, null, null, 0, false));
     }
 
     /**

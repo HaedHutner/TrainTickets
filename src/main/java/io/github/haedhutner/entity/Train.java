@@ -38,4 +38,9 @@ public class Train implements Entity<Integer> {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    @Override
+    public String toString() {
+        return String.format("[%d]%s @ %s", this.id, this.route.toString(), this.departs.toString());
+    }
 }
