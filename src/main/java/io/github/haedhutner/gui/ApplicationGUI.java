@@ -52,6 +52,7 @@ public class ApplicationGUI extends JFrame {
 
         LineManager.getInstance().init();
         TrainManager.getInstance().init();
+        TicketManager.getInstance().init();
 
         newTrainLine.addActionListener(event -> LineDialog.create());
         deleteTrainLineButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedLine(), LineManager.getInstance()));

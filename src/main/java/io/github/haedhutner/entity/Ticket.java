@@ -4,6 +4,8 @@ public class Ticket implements Entity<Integer> {
 
     private Integer id;
 
+    private Double price;
+
     private Train train;
 
     public Ticket() {}
@@ -24,5 +26,13 @@ public class Ticket implements Entity<Integer> {
 
     public Train getTrain() {
         return train;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

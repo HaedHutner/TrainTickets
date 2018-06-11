@@ -12,7 +12,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ticket,Integer> {
+public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ticket, Integer> {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;

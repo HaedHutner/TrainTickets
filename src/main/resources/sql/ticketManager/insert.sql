@@ -1,1 +1,1 @@
-INSERT INTO `tickets` ( `ticket_train` ) VALUES ( ? );
+INSERT INTO `tickets` ( `ticket_price`, `ticket_train` ) VALUES ( ? );

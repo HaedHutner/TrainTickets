@@ -116,7 +116,7 @@ public class TrainDialog extends JDialog implements CreateFilterUpdateDialog<Tra
 
     @Override
     public void updateEntity() {
-        if ( train == null ) return;
+        if (train == null) return;
         train.setRoute((Line) routeCombo.getSelectedItem());
         train.setDepartureTime(LocalDateTime.parse(departureTextField.getText()));
     }

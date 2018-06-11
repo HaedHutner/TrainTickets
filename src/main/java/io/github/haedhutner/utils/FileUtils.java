@@ -14,7 +14,7 @@ public final class FileUtils {
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
             reader.lines().forEach(line -> {
-                if (!line.isEmpty()) builder.append(line).append("\n");
+                if (!line.isEmpty()) builder.append(line).append(" ");
             });
         } catch (IOException e) {
             e.printStackTrace();

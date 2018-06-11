@@ -1,1 +1,1 @@
-SELECT * FROM `tickets` WHERE ticket_train = ?;
+SELECT * FROM `tickets` WHERE ticket_train = ? OR ticket_price = ?;

@@ -112,7 +112,7 @@ public class LineDialog extends JDialog implements CreateFilterUpdateDialog<Line
 
     @Override
     public void updateEntity() {
-        if ( line == null ) return;
+        if (line == null) return;
         line.setStationStart(fromField.getText());
         line.setDistance((Integer) distanceField.getValue());
         line.setStationStop(toField.getText());

@@ -1,1 +1,1 @@
-SELECT * FROM `tickets`;
+SELECT tickets.ticket_id, tickets.ticket_price, trainlines.line_start, trainlines.line_distance, trainlines.line_stop, trains.train_departingat FROM tickets JOIN trains ON tickets.ticket_train = trains.train_id JOIN trainlines ON trains.train_route = trainlines.line_id

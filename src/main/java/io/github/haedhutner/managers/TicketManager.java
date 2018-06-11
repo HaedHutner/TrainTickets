@@ -29,6 +29,8 @@ public class TicketManager extends AbstractManager<Ticket,Integer> {
     protected Optional<Ticket> modelFromResultSet(ResultSet result) throws SQLException {
         Ticket ticket = new Ticket();
 
+        ticket.setPrice(result.getDouble("ticket_price"));
+
         TrainManager.getInstance().select(result.getInt("ticket_train")).ifPresent(ticket::setTrain);
 
         return Optional.of(ticket);
@@ -41,12 +43,12 @@ public class TicketManager extends AbstractManager<Ticket,Integer> {
 
     @Override
     public void insert(Ticket object) {
-        query(INSERT_QUERY, object.getTrain().getId() );
+        query(INSERT_QUERY, object.getPrice(), object.getTrain().getId() );
     }
 
     @Override
     public void update(Ticket object) {
-        query(UPDATE_QUERY, object.getTrain(), object.getId());
+        query(UPDATE_QUERY, object.getPrice(), object.getTrain().getId(), object.getId());
     }
 
     @Override
