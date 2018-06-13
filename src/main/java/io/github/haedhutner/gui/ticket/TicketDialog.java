@@ -38,7 +38,7 @@ public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ti
         setResizable(false);
         setMinimumSize(new Dimension(600, 200));
         setPreferredSize(contentPane.getMinimumSize());
-
+        priceSpinner.setModel(new SpinnerNumberModel(0.0d, 0.0d, 9999.0d, 0.01d));
         // call onCancel() when cross is clicked
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -122,12 +122,14 @@ public class TicketDialog extends JDialog implements CreateFilterUpdateDialog<Ti
     @Override
     public void updateEntity() {
         ticket.setTrain((Train) trainComboBox.getSelectedItem());
-        ticket.setPrice((Double) priceSpinner.getValue());
+        ticket.setPrice((double) priceSpinner.getValue());
     }
 
     @Override
     public void setEntity(Ticket entity) {
         this.ticket = entity;
+        this.trainComboBox.setSelectedItem(entity.getTrain());
+        this.priceSpinner.setValue(entity.getPrice());
     }
 
     {

@@ -68,7 +68,7 @@ public class ApplicationGUI extends JFrame {
         filterTrainButton.addActionListener(event -> TrainDialog.filter());
 
         buyTicketButton.addActionListener(event -> TicketDialog.create());
-        deleteTicketButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedTrain(), TrainManager.getInstance()));
+        deleteTicketButton.addActionListener(event -> DeleteEntityDialog.open(getSelectedTicket(), TicketManager.getInstance()));
         updateTicketButton.addActionListener(event -> TicketDialog.update(getSelectedTicket()));
         filterTicketsButton.addActionListener(event -> TicketDialog.filter());
 
@@ -117,8 +117,11 @@ public class ApplicationGUI extends JFrame {
 
         Ticket ticket = new Ticket();
 
-        ticket.setPrice((Double) ticketData.get("ticket_price"));
-        TrainManager.getInstance().select((Integer) ticketData.get("ticket_train")).ifPresent(ticket::setTrain);
+        System.out.println(ticketData.toString());
+
+        ticket.setId((Integer) ticketData.get("TICKET_ID"));
+        ticket.setPrice((Double) ticketData.get("TICKET_PRICE"));
+        TrainManager.getInstance().select((Integer) ticketData.get("TICKET_TRAIN")).ifPresent(ticket::setTrain);
 
         return ticket;
     }
